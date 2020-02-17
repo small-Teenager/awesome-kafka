@@ -1,0 +1,42 @@
+
+如果启动不了 修改kafka-run-class 
+
+set COMMAND=%JAVA% %KAFKA_HEAP_OPTS% %KAFKA_JVM_PERFORMANCE_OPTS% %KAFKA_JMX_OPTS% %KAFKA_LOG4J_OPTS% -cp %CLASSPATH% %KAFKA_OPTS% %*中%CLASSPATH%加入""
+
+set COMMAND=%JAVA% %KAFKA_HEAP_OPTS% %KAFKA_JVM_PERFORMANCE_OPTS% %KAFKA_JMX_OPTS% %KAFKA_LOG4J_OPTS% -cp "%CLASSPATH%" %KAFKA_OPTS% %*
+1 zookeeper start
+
+zookeeper-server-start.bat E:\es\kafka_2.11-1.0.0\config\zookeeper.properties
+
+2 kafka start
+
+kafka-server-start.bat E:\es\kafka_2.11-1.0.0\config\server.properties
+
+3 创建一个名为mytest的topic
+
+kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 3 --topic mytest
+
+
+1.使用 --zookeeper 会绕过 Kafka 的安全体系。这就是说，即使你为 Kafka 集群设置了安全认证，限制了主题的创建，如果你使用 --zookeeper 的命令，依然能成功创建任意主题，不受认证体系的约束。这显然是 Kafka 集群的运维人员不希望看到的。
+
+2.使用 --zookeeper 与集群进行交互，越来越成为使用 Kafka 的标准姿势。换句话说，以后会有越来越少的命令和 API 需要与 ZooKeeper 进行连接。这样，我们只需要一套连接信息，就能与 Kafka 进行全方位的交互，不用像以前一样，必须同时维护 ZooKeeper 和 Broker 的连接信息。
+
+查看当前的Kafka中的所有Topic
+
+kafka-topics.bat --list --zookeeper localhost:2181
+
+4 查看topic
+
+kafka-topics.bat --describe --zookeeper localhost:2181 --topic mytest
+
+删除某个topic: --delete --topic mytest
+
+--list, --describe, --create, --alter or --delete
+
+5 发布/生产消息窗口，端口号默认为9092 
+
+kafka-console-producer.bat --broker-list localhost:9092 --topic mytest
+ 
+6 消费消息窗口
+
+kafka-console-consumer.bat --zookeeper localhost:2181 --from-beginning --topic mytest
